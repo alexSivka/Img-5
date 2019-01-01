@@ -75,7 +75,7 @@ string default - path to placeholder, if defined and source image does not exist
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Billie Thompson** - *Initial work* - [AlexSivka](https://github.com/alexSivka/)
 
 ## License
 
