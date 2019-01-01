@@ -13,7 +13,7 @@ if source or converted images are not modified.
 
 ## Getting Started
 
-Download zip package and unzip anywhere to your project.
+[Download](https://github.com/alexSivka/Img-5/releases) zip package and unzip anywhere to your project.
 
 ### Example
 
