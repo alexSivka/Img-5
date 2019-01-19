@@ -33,9 +33,21 @@ $params = array(
     'default' => ''
 );
 require_once 'Img/Img.php';
+without setting cache directory
 $src = Img::get('path/to/file.jpg', $params));
+
+$src = Img::get('path/to/file.jpg', array('width' => 100, 'height' => 150)));
+returns /path/to/thumbs/100x150/file.jpg
+
 or simple
 $src = Img::get('path/to/file.jpg', $width, [$height, [$crop]]);
+$src = Img::get('path/to/file.jpg', 100, 100, true);
+returns /path/to/thumbs/100x100cp/file.jpg
+
+with setting cache directory
+Img::setCacheDirectory('cache');
+$src = Img::get('path/to/file.jpg', 100, 100, true);
+returns /cache/path/to/thumbs/100x100cp/file.jpg
 ```
 
 ### Parameters
@@ -49,7 +61,7 @@ mixed crop - boolean or number(1/0) or string with crop position        center|t
 
 string watermark - path to watermark file_ext
 
-string wm_position - watermark position center|top|left|bottom|right|top left|top right|bottom left|bottom right
+string wm_position - watermark position center|top|left|bottom|right|top|left|top right|bottom left|bottom right
 
 float wm_opacity - opacity of watermar or watermark text
 
@@ -66,6 +78,23 @@ string wm_text_font - name of font for watermark text, the font file mast be in 
 
 string default - path to placeholder, if defined and source image does not exists, this file will be converted
 
+```
+
+### methods
+
+```
+static get($filepath, $params);
+static get($filepath, $width, [$height, [$crop]]);
+convert image and returns relative path to converted images
+
+static setCacheDirectory($path);
+sets path to cache directory
+
+static setDocRoot($docRoot);
+set DOCUMENT_ROOT, use this if $_SERVER['DOCUMENT_ROOT'] is not real absolute path to home directory
+
+static setPlaceholder($filepath);
+set path to placeholder image. If source image does not exists, path to placeholder will be returned.
 ```
 
 

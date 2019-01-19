@@ -13,14 +13,16 @@ require_once('SimpleImage.php');
 class Img {
 
 	/** @var string $docRoot DOCUMENT ROOT path. If not defined, will be used $_SERVER['DOCUMENT_ROOT']*/
-	public static $docRoot;
+	private static $docRoot;
 
 	/**
 	 * path to direcory where resized images should be placed. If not defined,
 	 * cache directory(with name "thumbs") will be created in source image directory.
 	 * @var string $cacheDirectory
 	 */
-	public static $cacheDirectory = '';
+	private static $cacheDirectory = '';
+	
+	private static $placeholder;
 
 	/**
 	 * Default values
@@ -87,8 +89,6 @@ class Img {
 				'crop' => $crop
 			);
 		}
-
-		if(!self::$docRoot) self::$docRoot = $_SERVER['DOCUMENT_ROOT'];
 
 		$params = self::setParams($params);
 
@@ -180,7 +180,7 @@ class Img {
 		$path = self::getRelativeLink(self::$cacheDirectory) . self::getRelativeLink($fileDir);
 		$dirs = preg_split('~[/]~', $path, -1, PREG_SPLIT_NO_EMPTY);
 
-		$thumbnailDir = self::$docRoot;
+		$thumbnailDir = self::getDocRoot();
 
 		foreach($dirs as $dir){
 			$thumbnailDir .= '/' . $dir;
@@ -191,23 +191,29 @@ class Img {
 
 	/** check if source file exists */
 	private static function checkFilepath($filepath, $params){
-		return  is_file( self::getAbsolutePath( $filepath ) ) ? $filepath : self::getDefaultImg();
+		return  is_file( self::getAbsolutePath( $filepath ) ) ? $filepath : self::getDefaultImg($params);
 	}
 
 	/** returns placeholder */
-	private static function getDefaultImg(){
+	private static function getDefaultImg($params){
+		if(self::$placeholder) return self::$placeholder;
 		return $params['default'] && is_file(self::getAbsolutePath($params['default'])) ? $params['default'] : '';
+	}
+	
+	public static function setPlaceholder($filepath){
+		self::$placeholder = $filepath;
 	}
 
 	/** calculate relative path of file */
 	private static function getRelativeLink($path){
-	    if (substr($path, 0, strlen(self::$docRoot)) == self::$docRoot) $path = substr($path, strlen(self::$docRoot));
+		$docRoot = self::getDocRoot();
+	    if (substr($path, 0, strlen($docRoot)) == $docRoot) $path = substr($path, strlen($docRoot));
 		return '/' . ltrim($path, '/');
 	}
 
 	/** calculate absolute path of file */
 	private static function getAbsolutePath($path){
-		return self::$docRoot . '/' . ltrim( self::getRelativeLink($path), '/' );
+		return self::getDocRoot() . '/' . ltrim( self::getRelativeLink($path), '/' );
 	}
 
 	/** setup params */
@@ -235,7 +241,16 @@ class Img {
 	}
 	/** set cache direcory path */
 	public static function setCacheDirectory($dir){
+		$dir = self::getAbsolutePath($dir);
 		self::$cacheDirectory = $dir;
+	}
+
+	public static function setDocRoot($docRoot){
+		self::$docRoot = rtrim($docRoot, '/');
+	}
+
+	public static function getDocRoot(){
+		return self::$docRoot ? self::$docRoot : $_SERVER['DOCUMENT_ROOT'];
 	}
 
 }
