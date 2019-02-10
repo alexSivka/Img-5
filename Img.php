@@ -1,6 +1,6 @@
 <?php
 
-require_once('SimpleImage.php');
+require_once 'SimpleImage.php';
 
 
 /**
@@ -12,11 +12,11 @@ require_once('SimpleImage.php');
  */
 class Img {
 
-	/** @var string $docRoot DOCUMENT ROOT path. If not defined, will be used $_SERVER['DOCUMENT_ROOT']*/
+	/** @var string $docRoot DOCUMENT ROOT path. If not defined, will be used $_SERVER['DOCUMENT_ROOT'] */
 	private static $docRoot;
 
 	/**
-	 * path to direcory where resized images should be placed. If not defined,
+	 * path to directory where resized images should be placed. If not defined,
 	 * cache directory(with name "thumbs") will be created in source image directory.
 	 * @var string $cacheDirectory
 	 */
@@ -27,17 +27,17 @@ class Img {
 	/**
 	 * Default values
 	 * @var array $defaults
-	 * @param number width - with to resized
-	 * @param number height - height to resized
+	 * @param integer width - with to resized
+	 * @param integer height - height to resized
 	 * @param mixed crop - boolean or number(1/0) or string with crop position center|top|left|bottom|right|top left|top right|bottom left|bottom right
 	 * @param string watermark - path to watermark file_ext
 	 * @param string wm_position - watermark position center|top|left|bottom|right|top left|top right|bottom left|bottom right
-	 * @param float wm_opacity - opacity of watermar or watermark text
-	 * @param number quality - quality for result images
+	 * @param float wm_opacity - opacity of watermark or watermark text
+	 * @param integer quality - quality for result images
 	 * @param string wm_text - text for overlay on images
 	 * @param mixed wm_text_color - color of watermark text,
 	 * 							maybe string('#FFFFFF') or array ['r'=>255,'g'=>255, 'b'=> 255, 'a'=>1] or array [255, 255, 255, 1]
-	 * @param number wm_text_size - font size of watermark text
+	 * @param integer wm_text_size - font size of watermark text
 	 * @param string wm_text_font - name of font for watermark text, the font file mast be in same directory with Img.php
 	 * @param string default - path to placeholder, if defined and source image does not exists, this file will be converted
 	 */
@@ -122,22 +122,36 @@ class Img {
 
 	}
 
-
-	/** put watermark on image */
+	/**
+	 * put watermark on image
+	 * @param object $img
+	 * @param array $params
+	 * @return void
+	 */
 	private static function setWatermark($img, $params){
 		$watermark = self::getAbsolutePath($params['watermark']);
 		if(!is_file($watermark)) return;
 		$img->overlay($watermark, $params['wm_position'], $params['wm_opacity']);
 	}
 
-	/** put watermark text on image */
+	/**
+	 * put watermark text on image
+	 * @param object $img
+	 * @param array $params
+	 * @return void
+	 */
 	private static function setWatermarkText($img, $params){
 		$fontPath = dirname(__FILE__) . '/' . $params['wm_text_font'];
 		$color = self::normalizeColor($params['wm_text_color'], $params['wm_opacity']);
     	$img->text($params['wm_text'], $fontPath, $params['wm_text_size'], array($color), $params['wm_position']);
 	}
 
-	/** create color array */
+	/**
+	 * create color array
+	 * @param mixed $color
+	 * @param integer $opacity
+	 * @return array
+	 */
 	private static function normalizeColor($color, $opacity = 0){
 		if(!is_string($color)) return $color;
 		$color = ltrim($color, '#');
@@ -150,7 +164,12 @@ class Img {
 		);
 	}
 
-	/** generate new file path */
+	/**
+	 * generate new file path
+	 * @param string $filepath
+	 * @param array $params
+	 * @return string
+	 */
 	private static function getNewFileName($filepath, $params){
 		$fileinfo = pathinfo($filepath);
 		$thumbnailDir = self::getCacheDirectory($fileinfo['dirname']);
@@ -170,7 +189,11 @@ class Img {
 		return $thumbnailDir . '/' . $fileinfo['filename'] . '.' . $fileinfo['extension'];
 	}
 
-	/** create cache directory */
+	/**
+	 * create cache directory
+	 * @param string $fileDir
+	 * @return string
+	 */
 	private static function getCacheDirectory($fileDir){
 		if(!self::$cacheDirectory){
 			$thumbnailDir = self::getAbsolutePath($fileDir . '/thumbs');
@@ -189,34 +212,60 @@ class Img {
 		return $thumbnailDir .= '/';
 	}
 
-	/** check if source file exists */
+	/**
+	 * check if source file exists
+	 * @param string $filepath
+	 * @param array $params
+	 * @return string
+	 */
 	private static function checkFilepath($filepath, $params){
 		return  is_file( self::getAbsolutePath( $filepath ) ) ? $filepath : self::getDefaultImg($params);
 	}
 
-	/** returns placeholder */
+	/**
+	 * returns placeholder img if source imf not exists
+	 * @param array $params
+	 * @return string
+	 */
 	private static function getDefaultImg($params){
 		if(self::$placeholder) return self::$placeholder;
 		return $params['default'] && is_file(self::getAbsolutePath($params['default'])) ? $params['default'] : '';
 	}
 	
+	/**
+	 * set placeholder image
+	 * @param string $filepath
+	 * @return void
+	 */
 	public static function setPlaceholder($filepath){
 		self::$placeholder = $filepath;
 	}
 
-	/** calculate relative path of file */
+	/**
+	 * calculate relative path of file
+	 * @param string $path
+	 * @return string
+	 */
 	private static function getRelativeLink($path){
 		$docRoot = self::getDocRoot();
 	    if (substr($path, 0, strlen($docRoot)) == $docRoot) $path = substr($path, strlen($docRoot));
 		return '/' . ltrim($path, '/');
 	}
 
-	/** calculate absolute path of file */
+	/**
+	 * calculate absolute path of file
+	 * @param string $path
+	 * @return string
+	 */
 	private static function getAbsolutePath($path){
 		return self::getDocRoot() . '/' . ltrim( self::getRelativeLink($path), '/' );
 	}
 
-	/** setup params */
+	/**
+	 * setup params
+	 * @param array $params
+	 * @return array
+	 */
 	public static function setParams($params){
 		$params = self::setFromAliases($params);
 		$params = array_merge(self::$defaults, $params);
@@ -224,12 +273,21 @@ class Img {
 		return $params;
 	}
 
-	/** setup default params */
+	/**
+	 * setup default params
+	 * @param array $params
+	 * @return void
+	 */
 	public static function setDefaults($params){
 		$params = self::setFromAliases($params);
 		self::$defaults = array_merge(self::$defaults, $params);
 	}
 
+	/**
+	 * set params defined as short aliases
+	 * @param array $params
+	 * @return array
+	 */
 	private static function setFromAliases($params){
 		foreach($params as $k => $v){
 			 if(isset(self::$aliases[$k])){
@@ -239,16 +297,30 @@ class Img {
 		}
 		return $params;
 	}
-	/** set cache direcory path */
+	
+	/**
+	 * set cache directory path
+	 * @param string $dir
+	 * @return void
+	 */
 	public static function setCacheDirectory($dir){
 		$dir = self::getAbsolutePath($dir);
 		self::$cacheDirectory = $dir;
 	}
 
+	/**
+	 * set DOCUMENT ROOT
+	 * @param string $docRoot
+	 * @return void
+	 */
 	public static function setDocRoot($docRoot){
 		self::$docRoot = rtrim($docRoot, '/');
 	}
 
+	/**
+	 * get DOCUMENT ROOT
+	 * @return string
+	 */
 	public static function getDocRoot(){
 		return self::$docRoot ? self::$docRoot : $_SERVER['DOCUMENT_ROOT'];
 	}
