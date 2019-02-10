@@ -17,7 +17,7 @@ if source or converted images are not modified.
 
 ### Example
 
-```
+```php
 $params = array(
     'width' => 100,
     'height' => 150,
@@ -52,7 +52,7 @@ returns /cache/path/to/thumbs/100x100cp/file.jpg
 
 ### Parameters
 
-```
+```php
 number width - with to resize
 
 number height - height to resize
@@ -69,8 +69,8 @@ number quality - quality for result images
 
 string wm_text - text for overlay on images
 
-mixed wm_text_color - color of watermark text,
-							maybe string('#FFFFFF') or array ['r'=>255,'g'=>255, 'b'=> 255, 'a'=>1] or array [255, 255, 255, 1]
+mixed wm_text_color - color of watermark text, maybe string('#FFFFFF') 
+or array ['r'=>255,'g'=>255, 'b'=> 255, 'a'=>1] or array [255, 255, 255, 1]
 
 number wm_text_size - font size of watermark text
 
@@ -82,7 +82,7 @@ string default - path to placeholder, if defined and source image does not exist
 
 ### methods
 
-```
+```php
 static get($filepath, $params);
 static get($filepath, $width, [$height, [$crop]]);
 convert image and returns relative path to converted images
@@ -108,4 +108,4 @@ set path to placeholder image. If source image does not exists, path to placehol
 
 ## License
 
-This project is licensed under the MIT License
+This project is licensed under the [MIT License](LICENSE.md)
